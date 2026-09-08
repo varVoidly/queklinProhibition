@@ -29,8 +29,9 @@ pathDriveDirectory = ((pathLocalDirectory).split("\\"))[0] + "\\"
 
 # Note 1 - Double backslashes
 
-pathMasterFile = "D:\Code\Python\queklinProhibition\pythonQueklinMasterFile.txt"
+pathMasterFile = pathLocalDirectory + "\\pythonQueklinMasterFile.txt"
 # Stores the pathway of the master file - Used to quickly reference the Master file without having to repeatedly locate it using functionFileLocator.
+# Note 1 - Double backslashes
 
 # --------------------- Function Defining ---------------------
 # Note 2 - Function purposes clarification
@@ -38,15 +39,18 @@ pathMasterFile = "D:\Code\Python\queklinProhibition\pythonQueklinMasterFile.txt"
 # Ensure the master exists, and creates it if not.
 def functionFileLocator():
 	try:
-		open("pythonQueklinMasterFile.txt", "x").close() # .close() automatically closes it, preventing resource leaks and avoiding using a with statement
-		with open("pythonQueklinMasterFile.txt", "w") as file:
-			file.write("00#00#00") # Play time in order of hours, minutes and seconds
-			file.write("prohibitedAppPathwayList#")
-			file.write("prohibitedAppNameList#")
+		print("DEBUG/INFORM: Determining Master File Presence.")
+		open(pathMasterFile, "x").close() # .close() automatically closes it, preventing resource leaks and avoiding using a with statement
+		print("DEBUG: File Not Found, Writing.")
+		with open(pathMasterFile, "w") as file:
+			file.write("00#00#00 \n prohibitedAppPathwayList#\n prohibitedAppNameList#") # Play time in order of hours, minutes and seconds
+		print("DEBUG/SUCCESS: pythonQueklinMasterFile.txt Created.")
+		# with open(
+		
 			
 		# Note 3
 	except (FileNotFoundError, IOError):
-		pass # Pass does nothing, effectively nullifying the error as the exception is parsed.
+		print("DEBUG/SUCCESS: File Found. Continuing.")
 
 
 
@@ -61,10 +65,10 @@ def functionFileLocator():
 
 
 
-print("Good Morning, User.")
-varName = input("Who Are We Today?")
+print("INFORM: Good Morning, User.")
+varName = input("QUERY: Who Are We Today?: ")
 
-print("Confirmed, Let Us Begin %s" % varName)
+print("SUCCESS: Confirmed, Let Us Begin %s" % varName)
 print("---")
 
 functionFileLocator()
