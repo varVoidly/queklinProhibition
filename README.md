@@ -10,5 +10,5 @@ NOTE: N/A
 
 
 
-SIGNATURE: This program was created by Wanderer Six, Otherwise known as varVoidly. I am a relatively new programmer, so if you see any mistakes or have any techniques or tricks that I may not know, please do correct and share!
+SIGNATURE: This program was created by varVoidly. I am a relatively new programmer, so if you see any mistakes or have any techniques or tricks that I may not know, please do correct and share!
 
