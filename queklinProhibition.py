@@ -19,11 +19,19 @@
 # --------------------- Imports ---------------------
 from pathlib import Path
 import os
-import sys
 import time
 
-os.system('pip install wmi')
-import wmi
+# os.system('pip install wmi')
+# Source - https://stackoverflow.com/a/50255019
+# Posted by Aaron de Windt, modified by community. See post 'Timeline' for change history
+# Retrieved 2026-09-18, License - CC BY-SA 4.0
+
+import subprocess
+import sys
+    
+def install(package):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+install("wmi")
 wmi= wmi.WMI() # Gives us a class nickname to call when executing related functions like x.Win32_Processes(), for example, where x = wmi 
 
 # --------------------- Global Variables ---------------------
@@ -128,9 +136,8 @@ def functionProhibitionMenu():
 				print("INFORM: If Multiple Processes Are Found Containing '%s', Do Not Worry. You Will Be Able To Decide Which You Would Like To Add To The Prohibition List After They Are Found.\n ---")
 				input("INPUT: Please Open %s And Press Enter Once It Has Fully Booted Up." % inputProcessName)
 				for process in wmi.Win32_Process():
-					ticker = 0
 					if process.name in inputProcessName:
-						print("SUCCESS: %s Was Found. Adding To Chamber List." % process.name)
+						print("SUCCESS: %s Was Found. Adding To Chamber List. \n ---" % process.name)
 						listProcessChamber.append(process.name)
 				if(len(listProcessChamber) == 0):
 					print("ERROR: No Process Found With %s In It's Name.")
@@ -140,7 +147,7 @@ def functionProhibitionMenu():
 						statusManualInput = True
 						while(statusManualInput):
 							print("Type '=' To Finish Inputting.")
-							inputManualInput = input("INPUT/INFORM: Enter The Name Of The Process. ONLY DO THIS IF YOU ARE CONFIDENT IT IS THE PROCESS ASSOCIATED WITH YOUR DESIRED APPLICATION.")
+							inputManualInput = input("INFORM: ONLY DO THIS IF YOU ARE CONFIDENT IT IS THE PROCESS ASSOCIATED WITH YOUR DESIRED APPLICATION. \n INPUT: Enter The Name Of The Process To Directly Add It To The Prohibition List.")
 							if(inputManualInput == "="):
 								statusManualInput = False
 							else:
