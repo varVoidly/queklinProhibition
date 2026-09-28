@@ -1,4 +1,4 @@
-# --------------------- LEFT OFF AT: Line 157 ---------------------
+# --------------------- LEFT OFF AT: Line 170 ---------------------
 
 
 # --------------------- Notes ---------------------
@@ -57,10 +57,11 @@ timeEnd = None
 
 masterList = []
 with open(pathMasterFile) as file:
-	fileOriginal = file.read().splitlines()
+	masterList = file.read().splitlines()
 
 masterTime = masterList[0]
 masterProcess = masterList[1]
+masterNickname = masterList[2]
 # --------------------- General Function Defining ---------------------
 # Note 2 - Function purposes clarification
 
@@ -83,6 +84,11 @@ def functionFileLocator():
 
 def functionClearTerminal():
 	os.system('cls' if os.name == 'nt' else 'clear') # Clear terminal
+
+def functionUpdateMasterFile(): # If you ever want something to do, add a check here to make sure all the master components are in the correct format
+	updateMasterFile = masterTime + "\n" + masterProcess + "\n" + masterNickname
+	with open(pathMasterFile, "w") as file:
+		file.write(updateMasterFile)
 
 
 
@@ -128,39 +134,43 @@ def functionProhibitionMenu():
 		print("1. Add New Process To Monitoring List")
 		print("2. Remove Processes From Monitoring List")
 		print("3. Display Monitoring List")
-		inputProhibitionMenu = input("INPUT: Enter Desired Options Number.")
+		inputProhibitionMenu = input("INPUT: Enter Desired Options Number: ")
 		listProcessChamber = []
 		match inputProhibitionMenu:
 			case "1":
-				inputProcessName = input("INPUT: What Is The Name Of The Application You Would Like To Add?")
+				inputProcessName = input("INPUT: What Is The Name Of The Application You Would Like To Add?: ")
 				print("INFORM: If Multiple Processes Are Found Containing '%s', Do Not Worry. You Will Be Able To Decide Which You Would Like To Add To The Prohibition List After They Are Found.\n ---")
-				input("INPUT: Please Open %s And Press Enter Once It Has Fully Booted Up." % inputProcessName)
+				input("INPUT: Please Open %s And Press Enter Once It Has Fully Booted Up: " % inputProcessName)
 				for process in wmi.Win32_Process():
 					if process.name in inputProcessName:
 						print("SUCCESS: %s Was Found. Adding To Chamber List. \n ---" % process.name)
 						listProcessChamber.append(process.name)
 				if(len(listProcessChamber) == 0):
-					print("ERROR: No Process Found With %s In It's Name.")
-					inputManualProcessName = input("INPUT: Would You Like To Manually Enter The Name Of The Desired Process? Y/N")
+					print("ERROR: No Process Found With %s In It's Name." % inputProcessName)
+					inputManualProcessName = input("INPUT: Would You Like To Manually Enter The Name Of The Desired Process? Y/N: ")
 					if(inputManualProcessName.upper == "Y"):
 						print("INFORM: To Find The Name Of Your Process, Press The Windows Button, Type 'Powershell' And Press Enter, Then Type 'ps' Into The Console And Search For The Name Of Your Process.")
 						statusManualInput = True
 						while(statusManualInput):
 							print("Type '=' To Finish Inputting.")
-							inputManualInput = input("INFORM: ONLY DO THIS IF YOU ARE CONFIDENT IT IS THE PROCESS ASSOCIATED WITH YOUR DESIRED APPLICATION. \n INPUT: Enter The Name Of The Process To Directly Add It To The Prohibition List.")
+							inputManualInput = input("INFORM: ONLY DO THIS IF YOU ARE CONFIDENT IT IS THE PROCESS ASSOCIATED WITH YOUR DESIRED APPLICATION. \n INPUT: Enter The Name Of The Process To Directly Add It To The Prohibition List: ")
 							if(inputManualInput == "="):
 								statusManualInput = False
 							else:
 								print("SUCCESS: %s Added To Chamber List." % inputManualInput)
 								listProcessChamber.append(inputManualInput)
-				else:
-					functionClearTerminal()
-					print("INFORM: Processes Found Are As Follows.")
-					for process in listProcessChamber:
-						print(process)
-					inputChamberListAdd = input("INPUT: Would You Like To Add These Processes To The Prohibition List? Y/N")
-					if(inputChamberListAdd.upper == "Y"):
-						print("SUCCESS: Adding To List")
+				functionClearTerminal()
+				print("INFORM: Processes Found Are As Follows. Please Enter A Nick Name For Each Process As They appear")
+				inputChamberNickname = []
+				for process in listProcessChamber:
+					inputChamberNickname.append(input("Nickname for %s: " % process))
+				inputChamberListAdd = input("INPUT: Would You Like To Add These Processes To The Prohibition List? Y/N: ")
+				if(inputChamberListAdd.upper == "Y"):
+					print("SUCCESS: Adding To List")
+				# Todo: Add a feature to remove unwanted processes from the list (which removes the entry from both the chamberNickname and ChamberList) and implement the feature to push both chambers to update
+
+
+
 
 
 
@@ -200,14 +210,14 @@ while(statusMainMenu):
 	print("4. Display Clockout Information")
 	print("5. To-Do And Prohibition Lists")
 
-	inputMainMenu = input("INFORM/INPUT: Enter Desired Options Number")
+	inputMainMenu = input("INFORM/INPUT: Enter Desired Options Number: ")
 	match inputMainMenu:
 		case "0":
 			functionClearTerminal()
 			if(statusClockedIn == True):
 				statusLocal = True
 				while(statusLocal):
-					inputExitProgramClockedIn = ("INPUT: You Are Currently Clocked In, Are You Sure You Would Like To Clock Out? Y/N")
+					inputExitProgramClockedIn = ("INPUT: You Are Currently Clocked In, Are You Sure You Would Like To Clock Out? Y/N: ")
 					if(inputExitProgramClockedIn.upper() == "Y"):
 						print("SUCCESS: Exiting Program")
 # CLOCK OUT NEEDS TO BE PUT HERE WHEN THE CLOCKOUT FUNCTION IS MADE!!!!!
@@ -229,7 +239,7 @@ while(statusMainMenu):
 			print("QUERY: Where Would You Like To Go?")
 			print("1. To Do lists")
 			print("2. Prohibition Lists")
-			inputToDoOrProhibition = input("INPUT: Enter Desired Options Number")
+			inputToDoOrProhibition = input("INPUT: Enter Desired Options Number: ")
 			match inputToDoOrProhibition:
 				case "1":
 					print("xxx")
