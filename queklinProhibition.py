@@ -1,12 +1,11 @@
 # --------------------- LEFT OFF AT: Line 170 ---------------------
-
+# This program has Todos scattered around that can be tracked by using ctrl+f and searching for "Todo:" without the quotations
 
 # --------------------- Notes ---------------------
 # Note 00: Note 0's are used for general notes that are not referenced anywhere in the code.
 
 # Note 01: Yes, i am fully aware(at the time of writing this, v0.1.0) that the current version can only handle a single file/profile. That may or may not change down the line when I finish the program and think "hmmmm, having a profiles system sure would be nice".
-
-
+ 
 
 # Note 1: Note how we use two back slashes in the split and addition operator string. One slash is used as a string/escape operator and has an effect on the string its within dependant on the character that follows the slash. By adding two backslashes, the first backslash "escapes" the second backslash, allowing it to exist without being interpreted as an effector that does not have a defined purpose(due to the lack of a character following it)
 
@@ -15,7 +14,9 @@
 
 # Note 3: open("filepath", "x") errors throw the subclass error "FileNotFoundError" AND the class error "IOError". Use "except (FileNotFoundError, IOError):" to catch whichever appears, or catch both, im not fully sure. Note that within the try portion, any error will instantly end the execution of the try portion and begin the execution of the except portion, preventing the execution of any lines following the line raising an error in the try portion
 
-
+# --------------------- Ideas ---------------------
+# Theoretical 1: Instead of finding processes, instead ask for the directory of the prohibited application, then kill processes that start from that directory
+# Practical 1.1: How will we know when a process starts from that directory? 
 # --------------------- Imports ---------------------
 from pathlib import Path
 import os
@@ -57,11 +58,11 @@ timeEnd = None
 
 masterList = []
 with open(pathMasterFile) as file:
-	masterList = file.read().splitlines()
+	masterList = file.read().splitlines() # Establishes the master list as a list with each element being each line
 
-masterTime = masterList[0]
-masterProcess = masterList[1]
-masterNickname = masterList[2]
+masterTime = map(int, masterList[0].split("#")) # Establishes the masterTime list by splitting the first line into elements deliminated by the hastag symbol and then turns each string element into an integer
+masterProcess = masterList[1].split("#") # Establishes the masterProcess list by splitting the second line into elements deliminated by the hastag symbol
+masterNickname = masterList[2].split("#") # Establishes the masterNickname list by splitting the third line into elements deliminated by the hastag symbol
 # --------------------- General Function Defining ---------------------
 # Note 2 - Function purposes clarification
 
@@ -85,8 +86,13 @@ def functionFileLocator():
 def functionClearTerminal():
 	os.system('cls' if os.name == 'nt' else 'clear') # Clear terminal
 
-def functionUpdateMasterFile(): # If you ever want something to do, add a check here to make sure all the master components are in the correct format
-	updateMasterFile = masterTime + "\n" + masterProcess + "\n" + masterNickname
+def functionUpdateMasterFile():
+	updateMasterTime = "#".join(map(str, masterTime)) # Converts the integers of the masterTime list to strings and then joins that list into one single string with each element separated by hashtags
+	updateMasterProcess = "#".join(masterProcess) # Joins each element of masterProcess into a string with each element separated by hashtags
+	updateMasterNickname = "#".join(masterNickname) # Joins each element of masterNickname into a string with each element separated by hashtags
+
+	
+	updateMasterFile = updateMasterTime + "\n" + updateMasterProcess + "\n" + updateMasterNickname
 	with open(pathMasterFile, "w") as file:
 		file.write(updateMasterFile)
 
@@ -131,21 +137,24 @@ def functionProhibitionMenu():
 	statusProhibitionMenu = True
 	while(statusProhibitionMenu):
 		print("Prohibition Menu")
-		print("1. Add New Process To Monitoring List")
+		print("1. Add New Process To Monitoring List") # This section is completed, but not tested, as of 0.1.7.
 		print("2. Remove Processes From Monitoring List")
 		print("3. Display Monitoring List")
+
 		inputProhibitionMenu = input("INPUT: Enter Desired Options Number: ")
-		listProcessChamber = []
+		listProcessChamber = [] # Prepares the process chamber list for use throughout the function
+		listNicknameChamber = [] # Prepares the nickname chamber list for use throughout the function
+
 		match inputProhibitionMenu:
 			case "1":
-				inputProcessName = input("INPUT: What Is The Name Of The Application You Would Like To Add?: ")
-				print("INFORM: If Multiple Processes Are Found Containing '%s', Do Not Worry. You Will Be Able To Decide Which You Would Like To Add To The Prohibition List After They Are Found.\n ---")
-				input("INPUT: Please Open %s And Press Enter Once It Has Fully Booted Up: " % inputProcessName)
-				for process in wmi.Win32_Process():
-					if process.name in inputProcessName:
-						print("SUCCESS: %s Was Found. Adding To Chamber List. \n ---" % process.name)
-						listProcessChamber.append(process.name)
-				if(len(listProcessChamber) == 0):
+				inputProcessName = input("INPUT: What Is The Name Of The Application You Would Like To Add?: ") #  Asks for and stores the name of processes to search for, doesnt actually do anything with them yet 
+				print("INFORM: If Multiple Processes Are Found Containing '%s', Do Not Worry. You Will Be Able To Dcide Which You Would Like To Add To The Prohibition List After They Are Found.\n ---")
+				input("INPUT: Please Open %s And Press Enter Once It Has Fully Booted Up: " % inputProcessName) # Asks to boot up the desired programs so they can be found
+				for process in wmi.Win32_Process(): # Iterates through each processes in the Win32_Process list
+					if process.name in inputProcessName: # If the current process matches the input:
+						print("SUCCESS: %s Was Found. Adding To Chamber List. \n ---" % process.name) 
+						listProcessChamber.append(process.name) # Adds the process name to the list, but not a nickname(multiple processes can be found with the same input)
+				if(len(listProcessChamber) == 0): # If no proceses are found
 					print("ERROR: No Process Found With %s In It's Name." % inputProcessName)
 					inputManualProcessName = input("INPUT: Would You Like To Manually Enter The Name Of The Desired Process? Y/N: ")
 					if(inputManualProcessName.upper == "Y"):
@@ -153,21 +162,42 @@ def functionProhibitionMenu():
 						statusManualInput = True
 						while(statusManualInput):
 							print("Type '=' To Finish Inputting.")
-							inputManualInput = input("INFORM: ONLY DO THIS IF YOU ARE CONFIDENT IT IS THE PROCESS ASSOCIATED WITH YOUR DESIRED APPLICATION. \n INPUT: Enter The Name Of The Process To Directly Add It To The Prohibition List: ")
-							if(inputManualInput == "="):
+							inputManualInput = input("INFORM: ONLY DO THIS IF YOU ARE CONFIDENT IT IS THE PROCESS ASSOCIATED WITH YOUR DESIRED APPLICATION. \n INPUT: Enter The Name Of The Process To Directly Add It To The Prohibition List: ") # Adds the manual entry to a seperate, manual input variable
+							if(inputManualInput == "="): 
 								statusManualInput = False
 							else:
 								print("SUCCESS: %s Added To Chamber List." % inputManualInput)
-								listProcessChamber.append(inputManualInput)
-				functionClearTerminal()
-				print("INFORM: Processes Found Are As Follows. Please Enter A Nick Name For Each Process As They appear")
-				inputChamberNickname = []
-				for process in listProcessChamber:
-					inputChamberNickname.append(input("Nickname for %s: " % process))
-				inputChamberListAdd = input("INPUT: Would You Like To Add These Processes To The Prohibition List? Y/N: ")
-				if(inputChamberListAdd.upper == "Y"):
-					print("SUCCESS: Adding To List")
-				# Todo: Add a feature to remove unwanted processes from the list (which removes the entry from both the chamberNickname and ChamberList) and implement the feature to push both chambers to update
+								listProcessChamber.append(inputManualInput) # Adds the manual input variable to the process chamber.
+				functionClearTerminal() # Clears the terminal after processes have been found/entered
+				print("INFORM: Processes Found Are As Follows. Please Enter A Nickname For Each Process As They appear. Type 'Remove This Process' If You Want To Specifically Remove The Current Process.")
+				for process in listProcessChamber: # Iterates through current processes in the chamber
+					inputProcessNickname = input("Nickname for '%s': " % process) # Gets a nickname
+					if(inputProcessNickname.lower == "Remove This Process"):
+						print("SUCCESS: Removing %s From The Process List." % process)
+						listProcessChamber.remove(process)
+					else:
+						listNicknameChamber.append(inputProcessNickname) 
+				statusAddingChambers = True
+				while(statusAddingChambers):
+					inputChamberListAdd = input("INPUT: Would You Like To Add These Processes To The Prohibition List? Y/N: ") # Final confirmation
+					if(inputChamberListAdd.upper == "Y"):
+						print("SUCCESS: Adding To List And Returning To Prohibition Menu.")
+						masterProcess.extend(listProcessChamber) # Adds each element of the process chamber to the masterProcess, does NOT add listProcessChamber as a list though (which is what would happen if we used .append)
+						masterNickname.extend(listNicknameChamber) # Adds each element of the nickname chamber to the masterNickname, does NOT add listNicknameChamber as a list though (which is what would happen if we used .append)
+
+						listProcessChamber.clear() # Clears the chambers for the next use.
+						listNicknameChamber.clear()
+
+						statusAddingChambers = False
+					elif(inputChamberListAdd.upper == "N"):
+						print("SUCCESS: Discarding Chambers And Returning To Prohibition Menu.")
+						listProcessChamber.clear()
+						listNicknameChamber.clear()
+
+						statusAddingChambers = False
+					else:
+						print("ERROR: Unknown Input Detected. Please Try Again.")
+				
 
 
 
